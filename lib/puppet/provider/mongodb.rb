@@ -102,6 +102,13 @@ class Puppet::Provider::Mongodb < Puppet::Provider
       end
     end
 
+    if auth_enabled(config)
+      args.push('--username')
+      args.push(config['admin_username'])
+      args.push('--password')
+      args.push(config['admin_password'])
+    end
+
     args += ['--eval', cmd]
     mongo(args)
   end
