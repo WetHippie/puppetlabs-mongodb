@@ -24,9 +24,11 @@ describe Puppet::Type.type(:mongodb_database).provider(:mongodb) do
   let(:parsed_dbs) { %w(admin local) }
 
   let(:resource) { Puppet::Type.type(:mongodb_database).new(
-    { :ensure   => :present,
-      :name     => 'new_database',
-      :provider => described_class.name
+    { :ensure         => :present,
+      :name           => 'new_database',
+      :admin_username => 'admin',
+      :admin_password => 'password',
+      :provider       => described_class.name,
     }
   )}
 
@@ -37,6 +39,7 @@ describe Puppet::Type.type(:mongodb_database).provider(:mongodb) do
     @mongodconffile = tmp.path
     allow(provider.class).to receive(:get_mongod_conf_file).and_return(@mongodconffile)
     provider.class.stubs(:mongo_eval).with('printjson(db.getMongo().getDBs())').returns(raw_dbs)
+    provider.class.stubs(:mongo_eval).with('printjson(db.getMongo().getDBs())', {:admin_user => 'admin', :admin_pass=>'password'}).returns(raw_dbs)
     allow(provider.class).to receive(:db_ismaster).and_return(true)
   end
 

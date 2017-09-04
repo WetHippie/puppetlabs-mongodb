@@ -85,7 +85,7 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     config['allowInvalidHostnames']
   end
 
-  def self.mongo_cmd(db, host, cmd)
+  def self.mongo_cmd(db, host, cmd, args = {})
     config = get_mongo_conf
 
     args = [db, '--quiet', '--host', host]
@@ -104,9 +104,9 @@ class Puppet::Provider::Mongodb < Puppet::Provider
 
     if auth_enabled(config)
       args.push('--username')
-      args.push(config['admin_username'])
+      args.push(args['admin_user'])
       args.push('--password')
-      args.push(config['admin_password'])
+      args.push(args['admin_pass'])
     end
 
     args += ['--eval', cmd]
@@ -164,7 +164,7 @@ class Puppet::Provider::Mongodb < Puppet::Provider
   end
 
   # Mongo Command Wrapper
-  def self.mongo_eval(cmd, db = 'admin', retries = 10, host = nil)
+  def self.mongo_eval(cmd, db = 'admin', retries = 10, host = nil, args = {})
     retry_count = retries
     retry_sleep = 3
     if mongorc_file
@@ -175,9 +175,9 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     retry_count.times do |n|
       begin
         if host
-          out = mongo_cmd(db, host, cmd)
+          out = mongo_cmd(db, host, cmd, args)
         else
-          out = mongo_cmd(db, get_conn_string, cmd)
+          out = mongo_cmd(db, get_conn_string, cmd, args)
         end
       rescue => e
         Puppet.debug "Request failed: '#{e.message}' Retry: '#{n}'"
@@ -200,8 +200,8 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     out
   end
 
-  def mongo_eval(cmd, db = 'admin', retries = 10, host = nil)
-    self.class.mongo_eval(cmd, db, retries, host)
+  def mongo_eval(cmd, db = 'admin', retries = 10, host = nil, args = {})
+    self.class.mongo_eval(cmd, db, retries, host, args)
   end
 
   # Mongo Version checker

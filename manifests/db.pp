@@ -22,7 +22,9 @@ define mongodb::db (
 
   mongodb_database { $db_name:
     ensure => present,
-    tries  => $tries
+    tries  => $tries,
+    admin_username => $mongodb::server::admin_username,
+    admin_password => $mongodb::server::admin_password,
   }
 
   if $password_hash {
