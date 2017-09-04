@@ -1,12 +1,15 @@
 require 'spec_helper'
 
 describe 'mongodb::db', :type => :define do
+
   context 'default' do
     let(:title) { 'testdb' }
 
     let(:params) {
       { 'user'     => 'testuser',
         'password' => 'testpass',
+        'admin_username' => 'admin',
+        'admin_password' => 'password'
       }
     }
 
@@ -48,6 +51,8 @@ describe 'mongodb::db', :type => :define do
         'db_name'  => 'testdb',
         'user'     => 'testuser',
         'password' => 'testpass',
+        'admin_username' => 'admin',
+        'admin_password' => 'password'
       }
     }
 

@@ -18,13 +18,15 @@ define mongodb::db (
   $password      = undef,
   $roles         = ['dbAdmin'],
   $tries         = 10,
+  $admin_username = $mongodb::server::admin_username,
+  $admin_password = $mongodb::server::admin_password,
 ) {
 
   mongodb_database { $db_name:
     ensure => present,
     tries  => $tries,
-    admin_username => $mongodb::server::admin_username,
-    admin_password => $mongodb::server::admin_password,
+    admin_username => $admin_username,
+    admin_password => $admin_password,
   }
 
   if $password_hash {
