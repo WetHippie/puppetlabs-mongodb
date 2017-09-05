@@ -157,7 +157,7 @@ class Puppet::Provider::Mongodb < Puppet::Provider
   end
 
   def db_ismaster(args = {})
-    self.class.db_ismaster
+    self.class.db_ismaster(args)
   end
 
   def self.auth_enabled(config=nil)
