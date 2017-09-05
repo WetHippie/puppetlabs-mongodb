@@ -85,7 +85,7 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     config['allowInvalidHostnames']
   end
 
-  def self.mongo_cmd(db, host, cmd, args = {})
+  def self.mongo_cmd(db, host, cmd, user_args = {})
     config = get_mongo_conf
 
     args = [db, '--quiet', '--host', host]
@@ -103,12 +103,12 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     end
 
     if auth_enabled(config)
-      Puppet.debug "Mongo DB has auth enabled. Accessing with args: #{args}"
+      Puppet.debug "Mongo DB has auth enabled. Accessing with args: #{user_args}"
 
       args.push('--username')
-      args.push(args['admin_user'])
+      args.push(user_args['admin_user'])
       args.push('--password')
-      args.push(args['admin_pass'])
+      args.push(user_args['admin_pass'])
     end
 
     args += ['--eval', cmd]
