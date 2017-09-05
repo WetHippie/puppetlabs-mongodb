@@ -8,6 +8,8 @@ Puppet::Type.type(:mongodb_database).provide(:mongodb, :parent => Puppet::Provid
   def self.instances(admin_username = nil, admin_password = nil)
     require 'json'
 
+    Puppet.debug "Listing Mongo DB instances with admin details: #{admin_username}/#{admin_password}"
+
     unless admin_username.nil? || admin_password.nil?
         extras = {
           :admin_pass => admin_password,
