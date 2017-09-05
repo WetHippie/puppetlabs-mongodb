@@ -103,7 +103,7 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     end
 
     if auth_enabled(config)
-      Puppet.debug "Mongo DB has auth enabled. Accessing with user: #{args['admin_user']} password: #{args['admin_pass']}"
+      Puppet.debug "Mongo DB has auth enabled. Accessing with args: #{args}"
 
       args.push('--username')
       args.push(args['admin_user'])
