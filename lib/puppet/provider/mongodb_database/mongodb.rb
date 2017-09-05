@@ -37,11 +37,12 @@ Puppet::Type.type(:mongodb_database).provide(:mongodb, :parent => Puppet::Provid
 
   def create
     puts "Create called with master #{db_ismaster}"
-    if db_ismaster
-      extras = {
-        :admin_user => @resource[:admin_username],
-        :admin_pass => @resource[:admin_password]
-      }
+    extras = {
+      :admin_user => @resource[:admin_username],
+      :admin_pass => @resource[:admin_password]
+    }
+
+    if db_ismaster(extras)
       mongo_eval('db.dummyData.insert({"created_by_puppet": 1})', @resource[:name], extras)
     else
       Puppet.warning 'Database creation is available only from master host'
@@ -49,11 +50,12 @@ Puppet::Type.type(:mongodb_database).provide(:mongodb, :parent => Puppet::Provid
   end
 
   def destroy
-    if db_ismaster
-      extras = {
-        :admin_user => @resource[:admin_username],
-        :admin_pass => @resource[:admin_password]
-      }
+    extras = {
+      :admin_user => @resource[:admin_username],
+      :admin_pass => @resource[:admin_password]
+    }
+
+    if db_ismaster(extras)
       mongo_eval('db.dropDatabase()', @resource[:name], extras)
     else
       Puppet.warning 'Database removal is available only from master host'

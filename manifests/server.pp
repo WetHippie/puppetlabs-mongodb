@@ -130,9 +130,11 @@ class mongodb::server (
     validate_string($admin_password)
 
     mongodb::db { 'admin':
-      user     => $admin_username,
-      password => $admin_password,
-      roles    => $admin_roles
+      user           => $admin_username,
+      password       => $admin_password,
+      admin_username => $admin_username,
+      admin_password => $admin_password,
+      roles          => $admin_roles
     }
 
     # Make sure it runs at the correct point

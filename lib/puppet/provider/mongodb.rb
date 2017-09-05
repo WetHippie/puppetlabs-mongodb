@@ -103,6 +103,8 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     end
 
     if auth_enabled(config)
+      Puppet.debug "Mongo DB has auth enabled. Accessing with user: #{args['admin_user']} password: #{args['admin_pass']}"
+
       args.push('--username')
       args.push(args['admin_user'])
       args.push('--password')
@@ -144,17 +146,17 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     "#{ip_real}:#{port_real}"
   end
 
-  def self.db_ismaster
+  def self.db_ismaster(args = {})
     cmd_ismaster = 'db.isMaster().ismaster'
     if mongorc_file
       cmd_ismaster = mongorc_file + cmd_ismaster
     end
     db = 'admin'
-    res = mongo_cmd(db, get_conn_string, cmd_ismaster).to_s.chomp()
+    res = mongo_cmd(db, get_conn_string, cmd_ismaster, args).to_s.chomp()
     res.eql?('true') ? true : false
   end
 
-  def db_ismaster
+  def db_ismaster(args = {})
     self.class.db_ismaster
   end
 
