@@ -8,14 +8,14 @@ Puppet::Type.newtype(:mongodb_database) do
     newvalues(/^[\w-]+$/)
   end
 
-  newproperty(:admin_username) do
+  newparam(:admin_username) do
     desc "Admin's user name needed to create the user. Only needed if auth is enabled on the server.
      This should be identical to the mongodb::server::admin_user property"
 
     newvalues(/^[\w-]+$/)
   end
 
-  newproperty(:admin_password) do
+  newparam(:admin_password) do
     desc "Admin's user cleartext password needed to create the user. Only needed if auth is enabled on
      the server. This should be identical to the mongodb::server::admin_user property"
 
