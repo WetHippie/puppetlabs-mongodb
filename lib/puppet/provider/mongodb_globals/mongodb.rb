@@ -11,21 +11,10 @@ Puppet::Type.type(:mongodb_globals).provide(:mongodb, :parent => Puppet::Provide
     super(resource)
     @property_flush = {}
 
-    Puppet.debug "Puppet global resource initialised"
-  end
+    Puppet.debug "Puppet global resource initialised with resources #{resource}"
 
-  def admin_username=(value)
-    set_admin_user(value)
-    @property_flush[:admin_username] = value
-
-    Puppet.debug "Set the admin username to #{value}"
-  end
-
-  def admin_password=(value)
-    set_admin_password(value)
-    @property_flush[:admin_password] = value
-
-    Puppet.debug "Set the admin password to #{value}"
+    set_admin_user(resource[:admin_username])
+    set_admin_password(resource[:admin_password])
   end
 
 end
