@@ -102,6 +102,14 @@ class mongodb::server (
     validate_bool($ssl_invalid_hostnames)
   }
 
+  if $auth {
+    mongodb_globals { 'admin user settings':
+      auth           => $auth,
+      admin_username => $admin_username,
+      admin_password => $admin_password,
+    }
+  }
+
   if ($ensure == 'present' or $ensure == true) {
     if $restart {
       anchor { 'mongodb::server::start': }
@@ -124,14 +132,6 @@ class mongodb::server (
     -> class { '::mongodb::server::config': }
     -> class { '::mongodb::server::install': }
     -> anchor { 'mongodb::server::end': }
-  }
-
-  if $auth {
-    mongodb_globals { 'admin user settings':
-      auth           => $auth,
-      admin_username => $admin_username,
-      admin_password => $admin_password,
-    }
   }
 
   if $create_admin {
