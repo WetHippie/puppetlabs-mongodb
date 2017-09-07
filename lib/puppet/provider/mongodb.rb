@@ -225,6 +225,7 @@ class Puppet::Provider::Mongodb < Puppet::Provider
   end
 
   def self.set_admin_user(username)
+    Puppet.debug "Mongo admin username set to #{username}"
     @@admin_username = username
   end
 
@@ -233,6 +234,7 @@ class Puppet::Provider::Mongodb < Puppet::Provider
   end
 
   def self.set_admin_password(password)
+    Puppet.debug "Mongo admin password set to #{password}"
     @@admin_password = password
   end
 
