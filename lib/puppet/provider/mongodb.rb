@@ -232,11 +232,11 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     self.class.set_admin_user(username)
   end
 
-  def self.set_admin_password(username, password)
+  def self.set_admin_password(password)
     @@admin_password = password
   end
 
-  def set_admin_user(password)
+  def set_admin_password(password)
     self.class.set_admin_password(password)
   end
 
