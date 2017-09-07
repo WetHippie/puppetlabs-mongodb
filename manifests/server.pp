@@ -126,6 +126,14 @@ class mongodb::server (
     -> anchor { 'mongodb::server::end': }
   }
 
+  if $auth {
+    mongodb_globals { 'admin user settings':
+      auth           => $auth,
+      admin_username => $admin_username,
+      admin_password => $admin_password,
+    }
+  }
+
   if $create_admin {
     validate_string($admin_password)
 

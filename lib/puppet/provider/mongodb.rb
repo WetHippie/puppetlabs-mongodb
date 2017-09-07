@@ -85,7 +85,7 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     config['allowInvalidHostnames']
   end
 
-  def self.mongo_cmd(db, host, cmd, user_args = {})
+  def self.mongo_cmd(db, host, cmd)
     config = get_mongo_conf
 
     args = [db, '--quiet', '--host', host]
@@ -103,12 +103,12 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     end
 
     if auth_enabled(config)
-      Puppet.debug "Mongo DB has auth enabled. Accessing with args: #{user_args}"
+      Puppet.debug "Mongo DB has auth enabled. Accessing with username: #{@@admin_username} and password #{@@admin_password}"
 
       args.push('--username')
-      args.push(user_args['admin_user'])
+      args.push(@@admin_username)
       args.push('--password')
-      args.push(user_args['admin_pass'])
+      args.push(@@admin_password)
     end
 
     args += ['--eval', cmd]
@@ -146,18 +146,18 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     "#{ip_real}:#{port_real}"
   end
 
-  def self.db_ismaster(args = {})
+  def self.db_ismaster
     cmd_ismaster = 'db.isMaster().ismaster'
     if mongorc_file
       cmd_ismaster = mongorc_file + cmd_ismaster
     end
     db = 'admin'
-    res = mongo_cmd(db, get_conn_string, cmd_ismaster, args).to_s.chomp()
+    res = mongo_cmd(db, get_conn_string, cmd_ismaster).to_s.chomp()
     res.eql?('true') ? true : false
   end
 
-  def db_ismaster(args = {})
-    self.class.db_ismaster(args)
+  def db_ismaster
+    self.class.db_ismaster
   end
 
   def self.auth_enabled(config=nil)
@@ -166,7 +166,7 @@ class Puppet::Provider::Mongodb < Puppet::Provider
   end
 
   # Mongo Command Wrapper
-  def self.mongo_eval(cmd, db = 'admin', retries = 10, host = nil, args = {})
+  def self.mongo_eval(cmd, db = 'admin', retries = 10, host = nil)
     retry_count = retries
     retry_sleep = 3
     if mongorc_file
@@ -177,9 +177,9 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     retry_count.times do |n|
       begin
         if host
-          out = mongo_cmd(db, host, cmd, args)
+          out = mongo_cmd(db, host, cmd)
         else
-          out = mongo_cmd(db, get_conn_string, cmd, args)
+          out = mongo_cmd(db, get_conn_string, cmd)
         end
       rescue => e
         Puppet.debug "Request failed: '#{e.message}' Retry: '#{n}'"
@@ -202,8 +202,8 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     out
   end
 
-  def mongo_eval(cmd, db = 'admin', retries = 10, host = nil, args = {})
-    self.class.mongo_eval(cmd, db, retries, host, args)
+  def mongo_eval(cmd, db = 'admin', retries = 10, host = nil)
+    self.class.mongo_eval(cmd, db, retries, host)
   end
 
   # Mongo Version checker
@@ -222,6 +222,22 @@ class Puppet::Provider::Mongodb < Puppet::Provider
 
   def mongo_24?
     self.class.mongo_24?
+  end
+
+  def self.set_admin_user(username)
+    @@admin_username = username
+  end
+
+  def set_admin_user(username)
+    self.class.set_admin_user(username)
+  end
+
+  def self.set_admin_password(username, password)
+    @@admin_password = password
+  end
+
+  def set_admin_user(password)
+    self.class.set_admin_password(password)
   end
 
 end

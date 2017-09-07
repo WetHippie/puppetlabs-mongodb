@@ -6,25 +6,7 @@ Puppet::Type.type(:mongodb_database).provide(:mongodb, :parent => Puppet::Provid
   defaultfor :kernel => 'Linux'
 
   def self.instances(admin_username = nil, admin_password = nil)
-    require 'json'
-
-    Puppet.debug "Listing Mongo DB instances with admin details: #{admin_username}/#{admin_password}"
-
-    unless admin_username.nil? || admin_password.nil?
-        extras = {
-          :admin_pass => admin_password,
-          :admin_user => admin_username,
-        }
-
-        dbs = JSON.parse mongo_eval('printjson(db.getMongo().getDBs())', extras)
-    else
-        dbs = JSON.parse mongo_eval('printjson(db.getMongo().getDBs())')
-    end
-
-    dbs['databases'].collect do |db|
-      new(:name   => db['name'],
-          :ensure => :present)
-    end
+    loadDatabases()
   end
 
   # Assign prefetched dbs based on name.
@@ -37,28 +19,35 @@ Puppet::Type.type(:mongodb_database).provide(:mongodb, :parent => Puppet::Provid
     end
   end
 
+  def self.loadDatabases
+    require 'json'
+
+    Puppet.debug "Querying for Mongo DB instances from server"
+
+    begin
+      dbs = JSON.parse mongo_eval('printjson(db.getMongo().getDBs())')
+    rescue Puppet::ExecutionFailure => e
+      Puppet.debug "Unable to list mongo databases due to error #{e.inspect()}"
+    end
+
+    dbs['databases'].collect do |db|
+      new(:name   => db['name'],
+          :ensure => :present)
+    end
+  end
+
   def create
     puts "Create called with master #{db_ismaster}"
-    extras = {
-      :admin_user => @resource[:admin_username],
-      :admin_pass => @resource[:admin_password]
-    }
-
-    if db_ismaster(extras)
-      mongo_eval('db.dummyData.insert({"created_by_puppet": 1})', @resource[:name], extras)
+    if db_ismaster
+      mongo_eval('db.dummyData.insert({"created_by_puppet": 1})', @resource[:name])
     else
       Puppet.warning 'Database creation is available only from master host'
     end
   end
 
   def destroy
-    extras = {
-      :admin_user => @resource[:admin_username],
-      :admin_pass => @resource[:admin_password]
-    }
-
-    if db_ismaster(extras)
-      mongo_eval('db.dropDatabase()', @resource[:name], extras)
+    if db_ismaster
+      mongo_eval('db.dropDatabase()', @resource[:name])
     else
       Puppet.warning 'Database removal is available only from master host'
     end
