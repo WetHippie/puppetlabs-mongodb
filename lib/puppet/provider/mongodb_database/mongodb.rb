@@ -5,7 +5,7 @@ Puppet::Type.type(:mongodb_database).provide(:mongodb, :parent => Puppet::Provid
 
   defaultfor :kernel => 'Linux'
 
-  def self.instances(admin_username = nil, admin_password = nil)
+  def self.instances
     loadDatabases()
   end
 
@@ -37,7 +37,6 @@ Puppet::Type.type(:mongodb_database).provide(:mongodb, :parent => Puppet::Provid
   end
 
   def create
-    puts "Create called with master #{db_ismaster}"
     if db_ismaster
       mongo_eval('db.dummyData.insert({"created_by_puppet": 1})', @resource[:name])
     else

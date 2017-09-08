@@ -3,6 +3,11 @@ Puppet::Type.newtype(:mongodb_globals) do
           that is used to pass the authentication flag, and option admin username and password
           down to the lower level providers. This should not be used by an end user."
 
+  ensurable do
+    defaultvalues
+    defaultto :present
+  end
+
   newparam(:name, :namevar=>true) do
     desc "Any name. Ignored by this global class."
   end
