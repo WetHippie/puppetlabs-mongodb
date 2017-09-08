@@ -12,16 +12,6 @@ Puppet::Type.type(:mongodb_globals).provide(:mongodb, :parent => Puppet::Provide
     []
   end
 
-  def initialize(resource={})
-    super(resource)
-    @property_flush = {}
-
-    Puppet.debug "Puppet global resource initialised with a #{@resource}. Username #{resource[:admin_username]}"
-
-    set_admin_user(resource[:admin_username])
-    set_admin_password(resource[:admin_password])
-  end
-
   def create
     Puppet.debug "Puppet globals created. Username #{resource[:admin_username]}"
 

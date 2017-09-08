@@ -16,10 +16,11 @@ describe Puppet::Type.type(:mongodb_globals).provider(:mongodb) do
 
   let(:instance) { provider.class.instances.first }
 
-  describe 'self.initialise' do
+  describe 'create' do
     it 'sets the username and password to the global class' do
       provider.expects(:set_admin_user).with('admin')
       provider.expects(:set_admin_password).with('password')
+      provider.create
     end
   end
 
