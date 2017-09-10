@@ -1,20 +1,12 @@
+require File.expand_path(File.join(File.dirname(__FILE__),'..','puppet','util','mongodb_conf'))
+
 require 'json'
 require 'yaml'
-
-def get_mongod_conf_file
-  if File.exists? '/etc/mongod.conf'
-    file = '/etc/mongod.conf'
-  else
-    file = '/etc/mongodb.conf'
-  end
-  file
-end
 
 Facter.add('mongodb_is_master') do
   setcode do
     if ['mongo', 'mongod'].all? {|m| Facter::Util::Resolution.which m}
-      file = get_mongod_conf_file
-      config = YAML.load_file(file)
+      config = Puppet::Util::MongodbConfLoader.get_mongod_conf_file
       mongoPort = nil
       if config.kind_of?(Hash) # Using a valid YAML file for mongo 2.6
         unless config['net.port'].nil?
@@ -33,11 +25,6 @@ Facter.add('mongodb_is_master') do
           ipv6 = "--ipv6"
         end
       else # It has to be a key-value config file
-        config = {}
-        File.readlines(file).collect do |line|
-          k,v = line.split('=')
-          config[k.rstrip] = v.lstrip.chomp if k and v
-        end
         unless config['port'].nil?
           mongoPort = "--port #{config['port']}"
         end
