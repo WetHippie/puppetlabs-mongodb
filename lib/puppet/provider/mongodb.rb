@@ -182,21 +182,31 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     return !out
   end
 
+  def noauth_admin_cmd(cmd)
+    self.class.noauth_admin_cmd(cmd)
+  end
+
   # check if we have valid authentication credentials. Assumes that the admin username and
   # password methods have already been called prior to this. No point calling this is auth
   # is not enabled.
   def self.has_valid_auth
+    cmd = 'db.version()'
+
     if mongorc_file
       cmd = mongorc_file + cmd
     end
 
     begin
-      out = mongo_cmd('admin', 'localhost', 'db.version()')
+      out = mongo_cmd('admin', 'localhost', cmd)
     rescue => e
       Puppet.debug "Auth credentials are not valid: '#{e.message}'"
     end
 
     return !out
+  end
+
+  def has_valid_auth
+    self.class.has_valid_auth
   end
 
   # Mongo Version checker
