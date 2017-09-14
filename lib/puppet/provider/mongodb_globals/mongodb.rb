@@ -28,7 +28,7 @@ Puppet::Type.type(:mongodb_globals).provide(:mongodb, :parent => Puppet::Provide
 
       cmd_json=<<-EOS.gsub(/^\s*/, '').gsub(/$\n/, '')
 	  {
-	    "createUser": "#{@resource[:username]}",
+	    "createUser": "#{@resource[:admin_username]}",
 	    "pwd": "#{password_hash}",
 	    "customData": {"createdBy": "Puppet Mongodb_globals['#{@resource[:name]}']"},
 	    "roles": #{@resource[:roles].to_json},
