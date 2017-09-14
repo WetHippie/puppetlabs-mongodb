@@ -8,8 +8,25 @@ Puppet::Type.newtype(:mongodb_globals) do
     defaultto :present
   end
 
+  def initialize(*args)
+    super
+    # Sort roles array before comparison.
+    self[:admin_roles] = Array(self[:admin_roles]).sort!
+  end
+
   newparam(:name, :namevar=>true) do
     desc "Any name. Ignored by this global class."
+  end
+
+  newparam(:auth, :boolean => false, :parent => Puppet::Parameter::Boolean) do
+    desc "Flag describing whether authentication is enabled on MongoDB. Defaults to no authentication.
+          If enabled, you need to also provide the username and password for the admin user."
+  end
+
+  newparam(:create_admin, :boolean => false, :parent => Puppet::Parameter::Boolean) do
+    desc "Flag describing whether to create or update the admin user of the database.
+         This setting is independent of the auth flag, but if the auth flag is true, then
+         an admin user needs to be created."
   end
 
   newparam(:admin_username) do
@@ -26,9 +43,19 @@ Puppet::Type.newtype(:mongodb_globals) do
     newvalues(/^[\w-]+$/)
   end
 
-  newparam(:auth, :boolean => false, :parent => Puppet::Parameter::Boolean) do
-    desc "Flag describing whether authentication is enabled on MongoDB. Defaults to no authentication.
-          If enabled, you need to also provide the username and password for the admin user."
+  newproperty(:admin_roles, :array_matching => :all) do
+    desc "The user's roles."
+    defaultto ['dbAdmin']
+    newvalue(/^\w+$/)
+
+    # Pretty output for arrays.
+    def should_to_s(value)
+      value.inspect
+    end
+
+    def is_to_s(value)
+      value.inspect
+    end
   end
 
   autorequire(:package) do

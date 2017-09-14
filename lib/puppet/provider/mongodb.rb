@@ -41,7 +41,7 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     config['allowInvalidHostnames']
   end
 
-  def self.mongo_cmd(db, host, cmd)
+  def self.mongo_cmd(db, host, cmd, ignore_auth = false)
     config = get_mongo_conf
 
     args = [db, '--quiet', '--host', host]
@@ -58,13 +58,17 @@ class Puppet::Provider::Mongodb < Puppet::Provider
       end
     end
 
-    if auth_enabled(config)
+    if ignore_auth
+       Puppet.debug "MongoDB command is ignoring putting in authentication command options"
+    elsif auth_enabled(config)
       Puppet.debug "Mongo DB has auth enabled. Accessing with username: #{@@admin_username} and password #{@@admin_password}"
 
       args.push('--username')
       args.push(@@admin_username)
       args.push('--password')
       args.push(@@admin_password)
+    else
+      Puppet.debug "MongoDB command does not require authentication"
     end
 
     args += ['--eval', cmd]
@@ -160,6 +164,39 @@ class Puppet::Provider::Mongodb < Puppet::Provider
 
   def mongo_eval(cmd, db = 'admin', retries = 10, host = nil)
     self.class.mongo_eval(cmd, db, retries, host)
+  end
+
+  # Called by the admin code to set the global admin user using the localhost hole when turning
+  # on authentication.
+  def noauth_admin_cmd(cmd)
+    if mongorc_file
+      cmd = mongorc_file + cmd
+    end
+
+    begin
+      out = mongo_cmd('admin', 'localhost', cmd, false)
+    rescue => e
+      Puppet.debug "Unable to run admin command without auth: '#{e.message}'"
+    end
+
+    return !out
+  end
+
+  # check if we have valid authentication credentials. Assumes that the admin username and
+  # password methods have already been called prior to this. No point calling this is auth
+  # is not enabled.
+  def has_valid_auth
+    if mongorc_file
+      cmd = mongorc_file + cmd
+    end
+
+    begin
+      out = mongo_cmd('admin', 'localhost', 'db.version()')
+    rescue => e
+      Puppet.debug "Auth credentials are not valid: '#{e.message}'"
+    end
+
+    return !out
   end
 
   # Mongo Version checker

@@ -35,10 +35,10 @@ describe 'mongodb::server' do
     it { is_expected.to contain_class('mongodb::server::service') }
 
     it {
-        is_expected.to contain_mongodb_user('admin user setup').with({
-          'database' => 'admin',
-          'username' => 'admin',
-          'roles'    => ["userAdmin", "readWrite", "dbAdmin", "dbAdminAnyDatabase",
+        is_expected.to contain_mongodb_globals('admin user settings').with({
+          'admin_username' => 'admin',
+          'admin_password' => 'password',
+          'admin_roles'    => ["userAdmin", "readWrite", "dbAdmin", "dbAdminAnyDatabase",
                          "readAnyDatabase", "readWriteAnyDatabase", "userAdminAnyDatabase",
                          "clusterAdmin", "clusterManager", "clusterMonitor", "hostManager",
                          "root", "restore"]

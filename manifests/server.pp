@@ -102,14 +102,6 @@ class mongodb::server (
     validate_bool($ssl_invalid_hostnames)
   }
 
-  if $auth {
-    mongodb_globals { 'admin user settings':
-      auth           => $auth,
-      admin_username => $admin_username,
-      admin_password => $admin_password,
-    }
-  }
-
   if ($ensure == 'present' or $ensure == true) {
     if $restart {
       anchor { 'mongodb::server::start': }
@@ -137,20 +129,19 @@ class mongodb::server (
   if $create_admin {
     validate_string($admin_password)
 
-    $admin_password_hash = mongodb_password($admin_username, $admin_password)
-
-    mongodb_user { 'admin user setup':
-      database       => 'admin',
-      username       => $admin_username,
-      password_hash  => $admin_password_hash,
-      roles          => $admin_roles
+    mongodb_globals { 'admin user settings':
+      auth           => $auth,
+      create_admin   => $create_admin,
+      admin_username => $admin_username,
+      admin_password => $admin_password,
+      admin_roles    => $admin_roles
     }
 
     # Make sure it runs at the correct point
-    Anchor['mongodb::server::end'] -> Mongodb_user['admin user setup']
+    Anchor['mongodb::server::end'] -> Mongodb_globals['admin user settings']
 
     # Make sure it runs before other DB creation
-    Mongodb_user['admin user setup'] -> Mongodb::Db <| title != 'admin' |>
+    Mongodb_globals['admin user settings'] -> Mongodb::Db <| title != 'admin' |>
   }
 
   # Set-up replicasets
