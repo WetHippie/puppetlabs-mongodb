@@ -31,7 +31,7 @@ Puppet::Type.type(:mongodb_globals).provide(:mongodb, :parent => Puppet::Provide
 	    "createUser": "#{@resource[:admin_username]}",
 	    "pwd": "#{password_hash}",
 	    "customData": {"createdBy": "Puppet Mongodb_globals['#{@resource[:name]}']"},
-	    "roles": #{@resource[:roles].to_json},
+	    "roles": #{@resource[:admin_roles].to_json},
 	    "digestPassword": false
 	  }
 	  EOS
