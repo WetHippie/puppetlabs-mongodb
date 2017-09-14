@@ -174,7 +174,7 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     end
 
     begin
-      out = mongo_cmd('admin', 'localhost', cmd, false)
+      out = mongo_cmd('admin', 'localhost', cmd, true)
     rescue => e
       Puppet.debug "Unable to run admin command without auth: '#{e.message}'"
     end
