@@ -38,7 +38,7 @@ Puppet::Type.type(:mongodb_database).provide(:mongodb, :parent => Puppet::Provid
 
   def create
     if db_ismaster
-      mongo_eval("db.getSiblingDB('#{@resource[:name]}').dummyData.insert({'created_by_puppet': 1})", @resource[:name])
+      mongo_eval("db.getSiblingDB('#{@resource[:name]}').dummyData.insert({'created_by_puppet': 1})")
     else
       Puppet.warning 'Database creation is available only from master host'
     end
