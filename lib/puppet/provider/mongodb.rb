@@ -189,7 +189,7 @@ class Puppet::Provider::Mongodb < Puppet::Provider
   # check if we have valid authentication credentials. Assumes that the admin username and
   # password methods have already been called prior to this. No point calling this is auth
   # is not enabled.
-  def self.has_valid_auth
+  def self.has_valid_auth?
     cmd = 'db.version()'
 
     if mongorc_file
@@ -205,7 +205,7 @@ class Puppet::Provider::Mongodb < Puppet::Provider
     return !out
   end
 
-  def has_valid_auth
+  def has_valid_auth?
     self.class.has_valid_auth
   end
 
