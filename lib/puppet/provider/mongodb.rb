@@ -44,6 +44,10 @@ class Puppet::Provider::Mongodb < Puppet::Provider
   def self.mongo_cmd(db, host, cmd, ignore_auth = false)
     config = get_mongo_conf
 
+    if auth_enabled(config)
+      db = 'admin'
+    end
+
     args = [db, '--quiet', '--host', host]
     args.push('--ipv6') if ipv6_is_enabled(config)
     args.push('--sslAllowInvalidHostnames') if ssl_invalid_hostnames(config)
