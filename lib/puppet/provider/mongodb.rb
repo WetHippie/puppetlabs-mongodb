@@ -168,7 +168,7 @@ class Puppet::Provider::Mongodb < Puppet::Provider
 
   # Called by the admin code to set the global admin user using the localhost hole when turning
   # on authentication.
-  def noauth_admin_cmd(cmd)
+  def self.noauth_admin_cmd(cmd)
     if mongorc_file
       cmd = mongorc_file + cmd
     end
@@ -185,7 +185,7 @@ class Puppet::Provider::Mongodb < Puppet::Provider
   # check if we have valid authentication credentials. Assumes that the admin username and
   # password methods have already been called prior to this. No point calling this is auth
   # is not enabled.
-  def has_valid_auth
+  def self.has_valid_auth
     if mongorc_file
       cmd = mongorc_file + cmd
     end
