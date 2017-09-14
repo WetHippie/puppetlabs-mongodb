@@ -206,7 +206,7 @@ class Puppet::Provider::Mongodb < Puppet::Provider
   end
 
   def has_valid_auth?
-    self.class.has_valid_auth
+    self.class.has_valid_auth?
   end
 
   # Mongo Version checker
